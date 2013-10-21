@@ -1,0 +1,55 @@
+<?php
+function subtes_block_view($delta) {
+  $block = array();
+  drupal_add_js(drupal_get_path('module','gcaba_subtes').'/js/marquee.js', 'external');
+  switch ($delta) {
+    case 'gcaba_subtes_estado':
+      $subtes = simplexml_load_file("http://www.infosubte.com.ar/medios/listinfosubte.asp");
+      $estaciones = array("lineaA" => "De Plaza de Mayo a San Pedrito", "lineaB" => "J.M. Rosas - L.N. Alem", "lineaC" => "Constitución a Retiro", "lineaD" => "Congreso de Tucumán a Catedral", "lineaE" => "Bolivar a Plaza de los Virreyes", "lineaH" => "Hospitales - Corrientes", "lineaP" => "De Int. Saguier a Centro Cívico Lugano / Gral. Savio");
+
+      $content_estado = '
+      <div class="circle dark clearfix subte-white">
+        <span><em></em></span>
+        <h3>
+          <a href="#"></a>
+          <a title="Estado del Subte" href="">Estado del Subte</a>
+        </h3>
+      </div>
+      ';
+      foreach($subtes as $subte) {
+
+      	if($subte->nombre!='' && $subte->nombre!='Línea U') {
+          
+          $subte->estado = trim($subte->estado);
+          $subte_id = str_replace('Línea ', 'linea', $subte->nombre);
+          $msg = empty($subte->estado) ? 'Servicio Normal' : $subte->estado;
+          $msg_class = empty($subte->estado)  ? 'servicio_normal' : 'servicio_alert';
+          if ($msg_class == 'servicio_alert') {
+            $msg = '<marquee behavior="scroll" scrollamount="5" direction="left" width="260">'.$msg.'</marquee>';
+          }
+          $content_estado .= '
+          <div id="'.$subte_id.'" class="linea">
+    	       <img src="'.drupal_get_path('module','gcaba_subtes').'/imagenes/'.$subte_id.'.jpg" alt="'.$subte_id.'" width="32" height="32">
+    	       <h4 class="estado_linea '.$msg_class.'">'.$msg.'</h4>
+             <span class="estaciones">'.$estaciones[$subte_id].'</span><br />
+          </div>';
+        }
+      }
+      $block['subject'] = 'Subtes Estado';
+      $block['content'] = $content_estado;
+      break;
+  }
+  return $block;
+}
+
+function subtes_block_info() {
+  $blocks['gcaba_subtes_estado'] = array(
+    'info' => 'GCABA Subtes Estado',
+	'cache' => DRUPAL_NO_CACHE
+  );
+  return $blocks;
+}
+ 
+// Html para la frecuencia que no se utiliza por el momento.
+//<span class="estaciones"> Frecuencia: '._frecuencia($subte->frecuencia).' minutos</span> 
+

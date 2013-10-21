@@ -1,0 +1,4 @@
+name = Subtes
+description = Modulo con widgets y aplicaciones de Subtes BsAs.
+core = 7.x
+package = Plugins
